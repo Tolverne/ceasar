@@ -198,6 +198,69 @@
         let lastAngle = 0;
         const totalSteps = alphabet.length;
         const stepAngle = 360 / totalSteps;
+        let deferredPrompt;
+
+        // PWA Install functionality
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallPrompt();
+        });
+
+        function showInstallPrompt() {
+            const installPrompt = document.getElementById('installPrompt');
+            const installButton = document.getElementById('installButton');
+            const closeButton = document.getElementById('closePrompt');
+
+            // Show for 10 seconds, then auto-hide if not interacted with
+            setTimeout(() => {
+                if (!installPrompt.classList.contains('hidden')) {
+                    installPrompt.classList.add('hidden');
+                }
+            }, 10000);
+
+            installButton.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to install prompt: ${outcome}`);
+                    deferredPrompt = null;
+                }
+                installPrompt.classList.add('hidden');
+            });
+
+            closeButton.addEventListener('click', () => {
+                installPrompt.classList.add('hidden');
+            });
+        }
+
+        // For iOS Safari - show manual install instructions
+        function isIOSSafari() {
+            const ua = window.navigator.userAgent;
+            const iOS = !!ua.match(/iPad|iPhone|iPod/);
+            const webkit = !!ua.match(/WebKit/);
+            const isSafari = iOS && webkit && !ua.match(/CriOS/);
+            return isSafari;
+        }
+
+        // Show install prompt for iOS users with different text
+        window.addEventListener('load', () => {
+            if (isIOSSafari() && !window.navigator.standalone) {
+                const installPrompt = document.getElementById('installPrompt');
+                const installText = document.querySelector('.install-text');
+                const installButton = document.getElementById('installButton');
+                
+                installText.textContent = '📱 Add to Home Screen: Tap Share button ⬆️ then "Add to Home Screen"';
+                installButton.style.display = 'none';
+                
+                setTimeout(() => {
+                    installPrompt.classList.add('hidden');
+                }, 12000);
+            } else if (!deferredPrompt) {
+                // Show generic install message for other browsers that might support PWA
+                setTimeout(showInstallPrompt, 2000);
+            }
+        });
 
         function initializeWheels() {
             createWheel('outerContent', alphabet, 'outer-segment', 'outer-letter');
