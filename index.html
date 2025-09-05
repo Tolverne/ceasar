@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher Wheel</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkNhZXNhciBDaXBoZXIgV2hlZWwiLAogICJzaG9ydF9uYW1lIjogIkNpcGhlciBXaGVlbCIsCiAgImRlc2NyaXB0aW9uIjogIkEgc2ltcGxlIGNpcGhlciB3aGVlbCBmb3IgbGVhcm5pbmcgQ2Flc2FyIGNpcGhlcnMiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgInRoZW1lX2NvbG9yIjogIiMyNTYzZWIiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmOWZhZmIiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXlOalFpSUdobGFXZG9kRDBpTWpZMElpQjJhV1YzUW05NFBTSXdJREFnTWpZMElESTJOQ0krUEdOcGNtTnNaU0JqZUQwaU1UTXlJaUJqZVQwaU1UTXlJaUJ5UFNJeE1EQWlJR1pwYkd3OUlpTXlOVFl6WldJaUx6NDhkR1Y0ZENCNFBTSXhNeklpSUhrOUlqRXpNaUlnWm1sc2JEMGlJMlptWm1abUlpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJtYjI1MExXWmhiV2xzZVQwaWJXOXViM053WVdObElpQm1iMjUwTFhOcGVtVTlJamt3SWlCbWIyNTBMWGRsYVdkb2REMGlObTFoYmlJK1F6d3ZkR1Y0ZEQ0OEwzTjJaejQ9IiwKICAgICAgInNpemVzIjogIjI2NHgyNjQiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNjQiIGhlaWdodD0iMjY0IiB2aWV3Qm94PSIwIDAgMjY0IDI2NCI+PGNpcmNsZSBjeD0iMTMyIiBjeT0iMTMyIiByPSIxMDAiIGZpbGw9IiMyNTYzZWIiLz48dGV4dCB4PSIxMzIiIHk9IjEzMiIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSI5MCIgZm9udC13ZWlnaHQ9IjZtYW4iPkM8L3RleHQ+PC9zdmc+">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .cipher-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 2rem auto;
+        }
+
+        .wheel {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .outer-wheel {
+            width: 320px;
+            height: 320px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .inner-wheel {
+            width: 240px;
+            height: 240px;
+            background: linear-gradient(45deg, #4834d4, #686de0);
+            top: 40px;
+            left: 40px;
+            z-index: 2;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .inner-wheel:hover {
+            transform: scale(1.05);
+        }
+
+        .wheel-letters {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .letter {
+            position: absolute;
+            font-weight: bold;
+            font-size: 16px;
+            transform-origin: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .outer-letter {
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+        }
+
+        .inner-letter {
+            width: 25px;
+            height: 25px;
+            font-size: 16px;
+        }
+
+        .controls {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 2rem;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .shift-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .shift-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .shift-btn:hover {
+            background: #5a67d8;
+        }
+
+        .shift-display {
+            background: #f7fafc;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #2d3748;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: monospace;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .result {
+            background: #f0fff4;
+            border: 2px solid #68d391;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 1rem;
+            min-height: 80px;
+            word-wrap: break-word;
+        }
+
+        .instructions {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .instructions h3 {
+            color: #92400e;
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions p {
+            color: #78350f;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 640px) {
+            .cipher-container {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .outer-wheel {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .inner-wheel {
+                width: 200px;
+                height: 200px;
+                top: 40px;
+                left: 40px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔐 Caesar Cipher Wheel</h1>
+        <p>Encode and decode secret messages with your friends!</p>
+    </div>
+
+    <div class="cipher-container">
+        <div class="wheel outer-wheel">
+            <div class="wheel-letters" id="outerLetters"></div>
+        </div>
+        <div class="wheel inner-wheel" id="innerWheel">
+            <div class="wheel-letters" id="innerLetters"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Shift Amount (Key):</label>
+            <div class="shift-controls">
+                <button class="shift-btn" onclick="changeShift(-1)">← Less</button>
+                <div class="shift-display" id="shiftDisplay">3</div>
+                <button class="shift-btn" onclick="changeShift(1)">More →</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label for="inputText">Type your message:</label>
+            <textarea id="inputText" placeholder="Enter your secret message here..." oninput="processText()"></textarea>
+        </div>
+
+        <div class="control-group">
+            <label>Encrypted/Decrypted Result:</label>
+            <div class="result" id="outputText">Your encoded message will appear here...</div>
+        </div>
+
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <p>1. Adjust the shift amount using the buttons above</p>
+            <p>2. Type your message in the text box</p>
+            <p>3. Watch as it gets encoded automatically!</p>
+            <p>4. To decode a message, use the same shift amount that was used to encode it</p>
+        </div>
+    </div>
+
+    <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4gewogIGNvbnNvbGUubG9nKCdTZXJ2aWNlIHdvcmtlciBpbnN0YWxsZWQnKTsKfSk7CgpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2FjdGl2YXRlJywgZXZlbnQgPT4gewogIGNvbnNvbGUubG9nKCdTZXJ2aWNlIHdvcmtlciBhY3RpdmF0ZWQnKTsKfSk7CgpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgZXZlbnQgPT4gewogIC8vIFNpbXBsZSBwYXNzLXRocm91Z2ggZm9yIG5vdwogIGV2ZW50LnJlc3BvbmRXaXRoKGZldGNoKGV2ZW50LnJlcXVlc3QpKTsKfSk7')
+                .catch(err => console.log('Service worker registration failed'));
+        }
+
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let currentShift = 3;
+        let isDragging = false;
+        let lastAngle = 0;
+
+        function initializeWheels() {
+            createWheel('outerLetters', alphabet, 140, 'outer-letter');
+            createWheel('innerLetters', alphabet, 100, 'inner-letter');
+            updateInnerWheel();
+        }
+
+        function createWheel(containerId, letters, radius, className) {
+            const container = document.getElementById(containerId);
+            const angleStep = 360 / letters.length;
+            
+            for (let i = 0; i < letters.length; i++) {
+                const letter = document.createElement('div');
+                letter.className = `letter ${className}`;
+                letter.textContent = letters[i];
+                
+                const angle = i * angleStep - 90; // Start from top
+                const radian = (angle * Math.PI) / 180;
+                const x = radius * Math.cos(radian);
+                const y = radius * Math.sin(radian);
+                
+                letter.style.left = `calc(50% + ${x}px - 15px)`;
+                letter.style.top = `calc(50% + ${y}px - 15px)`;
+                
+                container.appendChild(letter);
+            }
+        }
+
+        function updateInnerWheel() {
+            const innerWheel = document.getElementById('innerWheel');
+            const rotation = (currentShift * 360) / 26;
+            innerWheel.style.transform = `rotate(${rotation}deg)`;
+            
+            document.getElementById('shiftDisplay').textContent = currentShift;
+            processText();
+        }
+
+        function changeShift(delta) {
+            currentShift = ((currentShift + delta - 1) % 26) + 1;
+            if (currentShift <= 0) currentShift = 26;
+            updateInnerWheel();
+        }
+
+        function caesarCipher(text, shift) {
+            return text.split('').map(char => {
+                if (char.match(/[a-zA-Z]/)) {
+                    const isUpperCase = char === char.toUpperCase();
+                    const charCode = char.toLowerCase().charCodeAt(0);
+                    const shifted = ((charCode - 97 + shift) % 26) + 97;
+                    const result = String.fromCharCode(shifted);
+                    return isUpperCase ? result.toUpperCase() : result;
+                }
+                return char;
+            }).join('');
+        }
+
+        function processText() {
+            const input = document.getElementById('inputText').value;
+            const output = document.getElementById('outputText');
+            
+            if (input.trim() === '') {
+                output.textContent = 'Your encoded message will appear here...';
+                return;
+            }
+            
+            const encoded = caesarCipher(input, currentShift);
+            output.textContent = encoded;
+        }
+
+        // Mouse/touch events for wheel interaction
+        const innerWheel = document.getElementById('innerWheel');
+        
+        function getAngle(e, element) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+        }
+
+        function startDrag(e) {
+            isDragging = true;
+            lastAngle = getAngle(e, innerWheel);
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const currentAngle = getAngle(e, innerWheel);
+            let deltaAngle = currentAngle - lastAngle;
+            
+            // Handle angle wrap-around
+            if (deltaAngle > 180) deltaAngle -= 360;
+            if (deltaAngle < -180) deltaAngle += 360;
+            
+            const steps = Math.round(deltaAngle / (360 / alphabet.length));
+            if (Math.abs(steps) > 0) {
+                changeShift(steps);
+                lastAngle = currentAngle;
+            }
+            
+            e.preventDefault();
+        }
+
+        function stopDrag() {
+            isDragging = false;
+        }
+
+        // Add event listeners
+        innerWheel.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+
+        innerWheel.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchend', stopDrag);
+
+        // Initialize the wheels when page loads
+        document.addEventListener('DOMContentLoaded', initializeWheels);
+    </script>
+</body>
+</html>
