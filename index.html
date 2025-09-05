@@ -22,6 +22,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             color: #333;
         }
 
@@ -29,6 +30,7 @@
             text-align: center;
             padding: 2rem 1rem;
             color: white;
+            margin-bottom: 2rem;
         }
 
         .header h1 {
@@ -44,193 +46,130 @@
 
         .cipher-container {
             position: relative;
-            width: 320px;
-            height: 320px;
-            margin: 2rem auto;
+            width: 400px;
+            height: 400px;
         }
 
         .wheel {
             position: absolute;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: white;
+            border: 3px solid #333;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .outer-wheel {
-            width: 320px;
-            height: 320px;
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            width: 400px;
+            height: 400px;
             top: 0;
             left: 0;
             z-index: 1;
         }
 
         .inner-wheel {
-            width: 240px;
-            height: 240px;
-            background: linear-gradient(45deg, #4834d4, #686de0);
-            top: 40px;
-            left: 40px;
+            width: 200px;
+            height: 200px;
+            top: 100px;
+            left: 100px;
             z-index: 2;
-            cursor: pointer;
-            transition: transform 0.3s ease;
+            cursor: grab;
+            transition: transform 0.2s ease;
+        }
+
+        .inner-wheel:active {
+            cursor: grabbing;
         }
 
         .inner-wheel:hover {
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
-        .wheel-letters {
+        .wheel-content {
             position: absolute;
             width: 100%;
             height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 50%;
+            left: 50%;
+            transform-origin: 0 0;
+            border-left: 1px solid #333;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 15px;
+        }
+
+        .outer-segment {
+            padding-top: 25px;
+        }
+
+        .inner-segment {
+            padding-top: 15px;
         }
 
         .letter {
-            position: absolute;
             font-weight: bold;
             font-size: 16px;
+            color: #333;
+            user-select: none;
             transform-origin: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
 
         .outer-letter {
-            width: 30px;
-            height: 30px;
             font-size: 18px;
         }
 
         .inner-letter {
-            width: 25px;
-            height: 25px;
             font-size: 16px;
         }
 
-        .controls {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin: 2rem;
-            max-width: 600px;
-            width: 90%;
-        }
-
-        .control-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .control-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .shift-controls {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .shift-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s;
-        }
-
-        .shift-btn:hover {
-            background: #5a67d8;
-        }
-
-        .shift-display {
-            background: #f7fafc;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-weight: bold;
-            color: #2d3748;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: monospace;
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .result {
-            background: #f0fff4;
-            border: 2px solid #68d391;
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: monospace;
-            font-size: 1rem;
-            min-height: 80px;
-            word-wrap: break-word;
-        }
-
-        .instructions {
-            background: #fffbeb;
-            border-left: 4px solid #f59e0b;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .instructions h3 {
-            color: #92400e;
-            margin-bottom: 0.5rem;
-        }
-
-        .instructions p {
-            color: #78350f;
-            line-height: 1.5;
+        .center-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
         }
 
         @media (max-width: 640px) {
             .cipher-container {
-                width: 280px;
-                height: 280px;
+                width: 320px;
+                height: 320px;
             }
             
             .outer-wheel {
-                width: 280px;
-                height: 280px;
+                width: 320px;
+                height: 320px;
             }
             
             .inner-wheel {
-                width: 200px;
-                height: 200px;
-                top: 40px;
-                left: 40px;
+                width: 160px;
+                height: 160px;
+                top: 80px;
+                left: 80px;
             }
             
             .header h1 {
                 font-size: 2rem;
+            }
+
+            .outer-segment {
+                padding-bottom: 12px;
+            }
+
+            .inner-segment {
+                padding-bottom: 8px;
             }
         }
     </style>
@@ -238,45 +177,17 @@
 <body>
     <div class="header">
         <h1>🔐 Caesar Cipher Wheel</h1>
-        <p>Encode and decode secret messages with your friends!</p>
+        <p>Drag the inner wheel to encode and decode messages!</p>
     </div>
 
     <div class="cipher-container">
         <div class="wheel outer-wheel">
-            <div class="wheel-letters" id="outerLetters"></div>
+            <div class="wheel-content" id="outerContent"></div>
         </div>
         <div class="wheel inner-wheel" id="innerWheel">
-            <div class="wheel-letters" id="innerLetters"></div>
+            <div class="wheel-content" id="innerContent"></div>
         </div>
-    </div>
-
-    <div class="controls">
-        <div class="control-group">
-            <label>Shift Amount (Key):</label>
-            <div class="shift-controls">
-                <button class="shift-btn" onclick="changeShift(-1)">← Less</button>
-                <div class="shift-display" id="shiftDisplay">3</div>
-                <button class="shift-btn" onclick="changeShift(1)">More →</button>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <label for="inputText">Type your message:</label>
-            <textarea id="inputText" placeholder="Enter your secret message here..." oninput="processText()"></textarea>
-        </div>
-
-        <div class="control-group">
-            <label>Encrypted/Decrypted Result:</label>
-            <div class="result" id="outputText">Your encoded message will appear here...</div>
-        </div>
-
-        <div class="instructions">
-            <h3>How to use:</h3>
-            <p>1. Adjust the shift amount using the buttons above</p>
-            <p>2. Type your message in the text box</p>
-            <p>3. Watch as it gets encoded automatically!</p>
-            <p>4. To decode a message, use the same shift amount that was used to encode it</p>
-        </div>
+        <div class="center-dot"></div>
     </div>
 
     <script>
@@ -286,82 +197,58 @@
                 .catch(err => console.log('Service worker registration failed'));
         }
 
-        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        let currentShift = 3;
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ';
+        let currentStep = 0;
         let isDragging = false;
         let lastAngle = 0;
+        const totalSteps = alphabet.length;
+        const stepAngle = 360 / totalSteps;
 
         function initializeWheels() {
-            createWheel('outerLetters', alphabet, 140, 'outer-letter');
-            createWheel('innerLetters', alphabet, 100, 'inner-letter');
-            updateInnerWheel();
+            createWheel('outerContent', alphabet, 'outer-segment', 'outer-letter');
+            createWheel('innerContent', alphabet, 'inner-segment', 'inner-letter');
         }
 
-        function createWheel(containerId, letters, radius, className) {
+        function createWheel(containerId, letters, segmentClass, letterClass) {
             const container = document.getElementById(containerId);
             const angleStep = 360 / letters.length;
             
             for (let i = 0; i < letters.length; i++) {
+                const segment = document.createElement('div');
+                segment.className = `segment ${segmentClass}`;
+                
                 const letter = document.createElement('div');
-                letter.className = `letter ${className}`;
-                letter.textContent = letters[i];
+                letter.className = `letter ${letterClass}`;
+                letter.textContent = letters[i] === ' ' ? '␣' : letters[i];
                 
-                const angle = i * angleStep - 90; // Start from top
-                const radian = (angle * Math.PI) / 180;
-                const x = radius * Math.cos(radian);
-                const y = radius * Math.sin(radian);
+                const angle = i * angleStep;
+                segment.style.transform = `rotate(${angle}deg)`;
                 
-                letter.style.left = `calc(50% + ${x}px - 15px)`;
-                letter.style.top = `calc(50% + ${y}px - 15px)`;
+                // Rotate letter to keep it upright
+                letter.style.transform = `rotate(${-angle}deg)`;
                 
-                container.appendChild(letter);
+                segment.appendChild(letter);
+                container.appendChild(segment);
             }
         }
 
-        function updateInnerWheel() {
+        function updateInnerWheel(step) {
             const innerWheel = document.getElementById('innerWheel');
-            const rotation = (currentShift * 360) / 26;
+            const rotation = step * stepAngle;
             innerWheel.style.transform = `rotate(${rotation}deg)`;
             
-            document.getElementById('shiftDisplay').textContent = currentShift;
-            processText();
-        }
-
-        function changeShift(delta) {
-            currentShift = ((currentShift + delta - 1) % 26) + 1;
-            if (currentShift <= 0) currentShift = 26;
-            updateInnerWheel();
-        }
-
-        function caesarCipher(text, shift) {
-            return text.split('').map(char => {
-                if (char.match(/[a-zA-Z]/)) {
-                    const isUpperCase = char === char.toUpperCase();
-                    const charCode = char.toLowerCase().charCodeAt(0);
-                    const shifted = ((charCode - 97 + shift) % 26) + 97;
-                    const result = String.fromCharCode(shifted);
-                    return isUpperCase ? result.toUpperCase() : result;
-                }
-                return char;
-            }).join('');
-        }
-
-        function processText() {
-            const input = document.getElementById('inputText').value;
-            const output = document.getElementById('outputText');
+            // Keep inner letters upright
+            const innerSegments = document.querySelectorAll('#innerContent .segment');
+            innerSegments.forEach((segment, index) => {
+                const segmentAngle = index * stepAngle;
+                const totalRotation = rotation + segmentAngle;
+                const letter = segment.querySelector('.letter');
+                letter.style.transform = `rotate(${-totalRotation}deg)`;
+            });
             
-            if (input.trim() === '') {
-                output.textContent = 'Your encoded message will appear here...';
-                return;
-            }
-            
-            const encoded = caesarCipher(input, currentShift);
-            output.textContent = encoded;
+            currentStep = step;
         }
 
-        // Mouse/touch events for wheel interaction
-        const innerWheel = document.getElementById('innerWheel');
-        
         function getAngle(e, element) {
             const rect = element.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
@@ -375,23 +262,31 @@
 
         function startDrag(e) {
             isDragging = true;
-            lastAngle = getAngle(e, innerWheel);
+            lastAngle = getAngle(e, document.getElementById('innerWheel'));
             e.preventDefault();
         }
 
         function drag(e) {
             if (!isDragging) return;
             
-            const currentAngle = getAngle(e, innerWheel);
+            const currentAngle = getAngle(e, document.getElementById('innerWheel'));
             let deltaAngle = currentAngle - lastAngle;
             
             // Handle angle wrap-around
             if (deltaAngle > 180) deltaAngle -= 360;
             if (deltaAngle < -180) deltaAngle += 360;
             
-            const steps = Math.round(deltaAngle / (360 / alphabet.length));
-            if (Math.abs(steps) > 0) {
-                changeShift(steps);
+            // Calculate how many steps to move based on accumulated angle change
+            const stepsToMove = Math.round(deltaAngle / stepAngle);
+            
+            if (Math.abs(stepsToMove) >= 1) {
+                let newStep = currentStep + stepsToMove;
+                
+                // Keep step within bounds
+                while (newStep < 0) newStep += totalSteps;
+                while (newStep >= totalSteps) newStep -= totalSteps;
+                
+                updateInnerWheel(newStep);
                 lastAngle = currentAngle;
             }
             
@@ -403,6 +298,8 @@
         }
 
         // Add event listeners
+        const innerWheel = document.getElementById('innerWheel');
+        
         innerWheel.addEventListener('mousedown', startDrag);
         document.addEventListener('mousemove', drag);
         document.addEventListener('mouseup', stopDrag);
@@ -410,6 +307,9 @@
         innerWheel.addEventListener('touchstart', startDrag);
         document.addEventListener('touchmove', drag);
         document.addEventListener('touchend', stopDrag);
+
+        // Prevent context menu on long press
+        innerWheel.addEventListener('contextmenu', e => e.preventDefault());
 
         // Initialize the wheels when page loads
         document.addEventListener('DOMContentLoaded', initializeWheels);
