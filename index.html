@@ -191,6 +191,28 @@
         <div class="center-dot"></div>
     </div>
 
+    <div class="notes-container">
+        <div class="notes-title">📝 Message Notes</div>
+        
+        <div class="note-section">
+            <label class="note-label original-label">Original Message:</label>
+            <textarea 
+                class="note-textarea original-textarea" 
+                placeholder="Write your original message here..."
+                rows="2"
+            ></textarea>
+        </div>
+        
+        <div class="note-section">
+            <label class="note-label encrypted-label">Encrypted Message:</label>
+            <textarea 
+                class="note-textarea encrypted-textarea" 
+                placeholder="Write your encrypted message here..."
+                rows="2"
+            ></textarea>
+        </div>
+    </div>
+
     <script>
         const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ';
         let currentStep = 0;
@@ -371,6 +393,82 @@
 
         // Initialize the wheels when page loads
         document.addEventListener('DOMContentLoaded', initializeWheels);
+
+        // Letter box functionality for notes
+        function addLetterBox(rowId) {
+            const row = document.getElementById(rowId);
+            const addBtn = row.querySelector('.add-letter-btn');
+            
+            const letterBox = document.createElement('div');
+            letterBox.className = 'letter-box';
+            letterBox.contentEditable = true;
+            letterBox.addEventListener('input', handleLetterInput);
+            letterBox.addEventListener('keydown', handleLetterKeydown);
+            letterBox.addEventListener('click', function() {
+                this.focus();
+            });
+            
+            row.insertBefore(letterBox, addBtn);
+            letterBox.focus();
+        }
+
+        function handleLetterInput(e) {
+            const box = e.target;
+            let value = box.textContent.toUpperCase();
+            
+            // Only allow single letters or space
+            if (value.length > 1) {
+                value = value.slice(-1);
+            }
+            
+            if (value === ' ') {
+                box.classList.add('space');
+                box.textContent = '␣';
+            } else if (value.match(/[A-Z]/)) {
+                box.classList.remove('space');
+                box.textContent = value;
+            } else {
+                box.textContent = '';
+            }
+            
+            // Auto-create next box if this one has content
+            if (value && !box.nextElementSibling.classList.contains('letter-box')) {
+                addLetterBox(box.parentElement.id);
+            }
+        }
+
+        function handleLetterKeydown(e) {
+            const box = e.target;
+            
+            if (e.key === 'Backspace' && box.textContent === '') {
+                // Remove empty box and focus previous
+                const prevBox = box.previousElementSibling;
+                if (prevBox && prevBox.classList.contains('letter-box')) {
+                    box.remove();
+                    prevBox.focus();
+                }
+                e.preventDefault();
+            } else if (e.key === 'ArrowLeft') {
+                const prevBox = box.previousElementSibling;
+                if (prevBox && prevBox.classList.contains('letter-box')) {
+                    prevBox.focus();
+                }
+                e.preventDefault();
+            } else if (e.key === 'ArrowRight') {
+                const nextBox = box.nextElementSibling;
+                if (nextBox && nextBox.classList.contains('letter-box')) {
+                    nextBox.focus();
+                } else if (nextBox && nextBox.classList.contains('add-letter-btn')) {
+                    addLetterBox(box.parentElement.id);
+                }
+                e.preventDefault();
+            } else if (e.key === 'Space') {
+                box.textContent = '␣';
+                box.classList.add('space');
+                addLetterBox(box.parentElement.id);
+                e.preventDefault();
+            }
+        }
     </script>
 </body>
 </html>
