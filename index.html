@@ -216,19 +216,58 @@
             flex-direction: column;
             gap: 1.5rem;
             margin-top: 2rem;
-            max-width: 600px;
-            width: 90%;
+            max-width: 700px;
+            width: 95%;
+        }
+
+        .row-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid #333;
+        }
+
+        .control-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .letters-per-row-input {
+            width: 70px;
+            padding: 0.5rem;
+            border: 2px solid #6366f1;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .letters-per-row-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
 
         .message-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
+            display: grid;
+            gap: 3px;
             min-height: 50px;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 12px;
             border: 3px solid #333;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .green-row {
+            background: #a7f3d0;
         }
 
         .original-row {
@@ -252,21 +291,23 @@
             font-size: 16px;
             color: #333;
             cursor: pointer;
-            transition: background-color 0.2s;
-            user-select: none;
+            transition: all 0.2s;
+            border-radius: 4px;
         }
 
         .letter-box:hover {
             background: white;
+            transform: scale(1.1);
         }
 
-        .letter-box.active {
+        .letter-box:focus {
             background: #ffff99;
             border: 2px solid #333;
+            outline: none;
         }
 
         .letter-box.space {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.4);
             border: 1px dashed #666;
         }
 
@@ -274,7 +315,7 @@
             width: 35px;
             height: 35px;
             border: 2px dashed #333;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -282,11 +323,13 @@
             color: #333;
             cursor: pointer;
             transition: all 0.2s;
+            border-radius: 4px;
+            font-weight: bold;
         }
 
         .add-letter-btn:hover {
-            background: rgba(255, 255, 255, 0.8);
-            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.15);
         }
 
         @media (max-width: 640px) {
@@ -336,6 +379,11 @@
                 height: 30px;
                 font-size: 14px;
             }
+
+            .row-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -362,6 +410,15 @@
     </div>
 
     <div class="notes-container">
+        <div class="row-controls">
+            <label class="control-label">Letters per row:</label>
+            <input type="number" class="letters-per-row-input" id="lettersPerRow" value="10" min="5" max="15" onchange="updateLettersPerRow()">
+        </div>
+        
+        <div class="message-row green-row" id="greenRow">
+            <div class="add-letter-btn" onclick="addLetterBox('greenRow')">+</div>
+        </div>
+        
         <div class="message-row original-row" id="originalRow">
             <div class="add-letter-btn" onclick="addLetterBox('originalRow')">+</div>
         </div>
@@ -380,6 +437,7 @@
         const stepAngle = 360 / totalSteps;
         let deferredPrompt;
         let installPromptShown = false;
+        let lettersPerRow = 10;
 
         // PWA Install functionality
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -396,10 +454,8 @@
             const installButton = document.getElementById('installButton');
             const closeButton = document.getElementById('closePrompt');
 
-            // Show the prompt
             installPrompt.classList.remove('hidden');
 
-            // Auto-hide after 15 seconds if not interacted with
             setTimeout(() => {
                 if (!installPrompt.classList.contains('hidden')) {
                     installPrompt.classList.add('hidden');
@@ -421,7 +477,6 @@
             });
         }
 
-        // For iOS Safari - show manual install instructions
         function isIOSSafari() {
             const ua = window.navigator.userAgent;
             const iOS = !!ua.match(/iPad|iPhone|iPod/);
@@ -430,7 +485,6 @@
             return isSafari;
         }
 
-        // Always show install prompt on page load
         window.addEventListener('load', () => {
             const installPrompt = document.getElementById('installPrompt');
             const installText = document.querySelector('.install-text');
@@ -438,7 +492,6 @@
             const closeButton = document.getElementById('closePrompt');
             
             if (isIOSSafari() && !window.navigator.standalone) {
-                // iPad/iPhone Safari specific instructions
                 installText.innerHTML = '📱 <strong>Add to Home Screen:</strong><br>Tap Share button <strong>⬆️</strong> then "Add to Home Screen"';
                 installButton.style.display = 'none';
                 installPrompt.classList.remove('hidden');
@@ -453,7 +506,6 @@
                     }
                 }, 15000);
             } else {
-                // Other browsers - show generic install message and wait for PWA prompt
                 installPrompt.classList.remove('hidden');
                 if (!installPromptShown) {
                     showInstallPrompt();
@@ -480,8 +532,6 @@
                 
                 const angle = i * angleStep;
                 segment.style.transform = `rotate(${angle}deg)`;
-                
-                // Rotate letter to keep it upright
                 letter.style.transform = `rotate(${-angle}deg)`;
                 
                 segment.appendChild(letter);
@@ -494,7 +544,6 @@
             const rotation = step * stepAngle;
             innerWheel.style.transform = `rotate(${rotation}deg)`;
             
-            // Keep inner letters upright
             const innerSegments = document.querySelectorAll('#innerContent .segment');
             innerSegments.forEach((segment, index) => {
                 const segmentAngle = index * stepAngle;
@@ -529,17 +578,14 @@
             const currentAngle = getAngle(e, document.getElementById('innerWheel'));
             let deltaAngle = currentAngle - lastAngle;
             
-            // Handle angle wrap-around
             if (deltaAngle > 180) deltaAngle -= 360;
             if (deltaAngle < -180) deltaAngle += 360;
             
-            // Calculate how many steps to move based on accumulated angle change
             const stepsToMove = Math.round(deltaAngle / stepAngle);
             
             if (Math.abs(stepsToMove) >= 1) {
                 let newStep = currentStep + stepsToMove;
                 
-                // Keep step within bounds
                 while (newStep < 0) newStep += totalSteps;
                 while (newStep >= totalSteps) newStep -= totalSteps;
                 
@@ -554,7 +600,6 @@
             isDragging = false;
         }
 
-        // Add event listeners for wheel
         const innerWheel = document.getElementById('innerWheel');
         
         innerWheel.addEventListener('mousedown', startDrag);
@@ -565,10 +610,22 @@
         document.addEventListener('touchmove', drag);
         document.addEventListener('touchend', stopDrag);
 
-        // Prevent context menu on long press
         innerWheel.addEventListener('contextmenu', e => e.preventDefault());
 
-        // Letter box functionality for notes
+        // Letter box functionality with row control
+        function updateLettersPerRow() {
+            lettersPerRow = parseInt(document.getElementById('lettersPerRow').value);
+            updateRowLayouts();
+        }
+
+        function updateRowLayouts() {
+            const rows = ['greenRow', 'originalRow', 'encryptedRow'];
+            rows.forEach(rowId => {
+                const row = document.getElementById(rowId);
+                row.style.gridTemplateColumns = `repeat(${lettersPerRow}, 35px)`;
+            });
+        }
+
         function addLetterBox(rowId) {
             const row = document.getElementById(rowId);
             const addBtn = row.querySelector('.add-letter-btn');
@@ -590,7 +647,6 @@
             const box = e.target;
             let value = box.textContent.toUpperCase();
             
-            // Only allow single letters or space
             if (value.length > 1) {
                 value = value.slice(-1);
             }
@@ -605,7 +661,6 @@
                 box.textContent = '';
             }
             
-            // Auto-create next box if this one has content
             if (value && !box.nextElementSibling.classList.contains('letter-box')) {
                 addLetterBox(box.parentElement.id);
             }
@@ -615,7 +670,6 @@
             const box = e.target;
             
             if (e.key === 'Backspace' && box.textContent === '') {
-                // Remove empty box and focus previous
                 const prevBox = box.previousElementSibling;
                 if (prevBox && prevBox.classList.contains('letter-box')) {
                     box.remove();
@@ -644,8 +698,10 @@
             }
         }
 
-        // Initialize the wheels when page loads
-        document.addEventListener('DOMContentLoaded', initializeWheels);
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeWheels();
+            updateRowLayouts();
+        });
     </script>
 </body>
 </html>
