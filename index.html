@@ -264,6 +264,7 @@
             border-radius: 12px;
             border: 3px solid #333;
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            position: relative;
         }
 
         .green-row {
@@ -276,6 +277,25 @@
 
         .encrypted-row {
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .share-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 0.4rem;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .share-btn:hover {
+            background: white;
+            transform: scale(1.1);
         }
 
         .letter-box {
@@ -332,6 +352,92 @@
             transform: scale(1.15);
         }
 
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .share-modal.hidden {
+            display: none;
+        }
+
+        .share-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .share-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .share-message {
+            background: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-family: monospace;
+            font-size: 1rem;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-option {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .share-option:hover {
+            background: #5a5fd8;
+        }
+
+        .share-cancel {
+            background: #e5e7eb;
+            color: #6b7280;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .share-cancel:hover {
+            background: #d1d5db;
+        }
+
         @media (max-width: 640px) {
             .cipher-container {
                 width: 320px;
@@ -384,6 +490,10 @@
                 flex-direction: column;
                 gap: 0.5rem;
             }
+
+            .share-options {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -416,15 +526,32 @@
         </div>
         
         <div class="message-row green-row" id="greenRow">
+            <button class="share-btn" onclick="shareMessage('greenRow')" title="Share this message">📤</button>
             <div class="add-letter-btn" onclick="addLetterBox('greenRow')">+</div>
         </div>
         
         <div class="message-row original-row" id="originalRow">
+            <button class="share-btn" onclick="shareMessage('originalRow')" title="Share this message">📤</button>
             <div class="add-letter-btn" onclick="addLetterBox('originalRow')">+</div>
         </div>
         
         <div class="message-row encrypted-row" id="encryptedRow">
+            <button class="share-btn" onclick="shareMessage('encryptedRow')" title="Share this message">📤</button>
             <div class="add-letter-btn" onclick="addLetterBox('encryptedRow')">+</div>
+        </div>
+    </div>
+
+    <div class="share-modal hidden" id="shareModal">
+        <div class="share-content">
+            <h3 class="share-title">Share Message</h3>
+            <div class="share-message" id="shareMessageText"></div>
+            <div class="share-options">
+                <button class="share-option" onclick="shareToService('email')">📧 Email</button>
+                <button class="share-option" onclick="shareToService('sms')">📱 SMS</button>
+                <button class="share-option" onclick="shareToService('copy')">📋 Copy</button>
+                <button class="share-option" onclick="shareToService('native')">📤 Share</button>
+            </div>
+            <button class="share-cancel" onclick="closeShareModal()">Cancel</button>
         </div>
     </div>
 
@@ -438,6 +565,7 @@
         let deferredPrompt;
         let installPromptShown = false;
         let lettersPerRow = 10;
+        let currentShareMessage = '';
 
         // PWA Install functionality
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -676,12 +804,6 @@
                     prevBox.focus();
                 }
                 e.preventDefault();
-            } else if (e.key === 'ArrowLeft') {
-                const prevBox = box.previousElementSibling;
-                if (prevBox && prevBox.classList.contains('letter-box')) {
-                    prevBox.focus();
-                }
-                e.preventDefault();
             } else if (e.key === 'ArrowRight') {
                 const nextBox = box.nextElementSibling;
                 if (nextBox && nextBox.classList.contains('letter-box')) {
@@ -698,10 +820,105 @@
             }
         }
 
+        // Share functionality
+        function shareMessage(rowId) {
+            const row = document.getElementById(rowId);
+            const letterBoxes = row.querySelectorAll('.letter-box');
+            
+            if (letterBoxes.length === 0) {
+                alert('No message to share! Add some letters first.');
+                return;
+            }
+            
+            let message = '';
+            letterBoxes.forEach(box => {
+                const letter = box.textContent;
+                if (letter === '␣') {
+                    message += ' ';
+                } else {
+                    message += letter;
+                }
+            });
+            
+            currentShareMessage = message.trim();
+            
+            if (currentShareMessage === '') {
+                alert('No message to share! Add some letters first.');
+                return;
+            }
+            
+            document.getElementById('shareMessageText').textContent = currentShareMessage;
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        function shareToService(service) {
+            const message = currentShareMessage;
+            const title = 'Cipher Wheel Message';
+            
+            switch (service) {
+                case 'email':
+                    const emailSubject = encodeURIComponent('Secret Message from Cipher Wheel');
+                    const emailBody = encodeURIComponent(`I created this message using the Caesar Cipher Wheel:\n\n"${message}"\n\nTry to decode it!`);
+                    window.open(`mailto:?subject=${emailSubject}&body=${emailBody}`);
+                    break;
+                    
+                case 'sms':
+                    const smsBody = encodeURIComponent(`Secret message from Cipher Wheel: "${message}" - Try to decode it!`);
+                    window.open(`sms:?body=${smsBody}`);
+                    break;
+                    
+                case 'copy':
+                    navigator.clipboard.writeText(message).then(() => {
+                        alert('Message copied to clipboard!');
+                    }).catch(() => {
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = message;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        alert('Message copied to clipboard!');
+                    });
+                    break;
+                    
+                case 'native':
+                    if (navigator.share) {
+                        navigator.share({
+                            title: title,
+                            text: `Secret message from Cipher Wheel: "${message}" - Try to decode it!`
+                        }).catch(console.error);
+                    } else {
+                        // Fallback to copy if native sharing not available
+                        shareToService('copy');
+                    }
+                    break;
+            }
+            
+            closeShareModal();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('shareModal').addEventListener('click', (e) => {
+            if (e.target.id === 'shareModal') {
+                closeShareModal();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             initializeWheels();
             updateRowLayouts();
         });
     </script>
 </body>
-</html>
+</html>rowLeft') {
+                const prevBox = box.previousElementSibling;
+                if (prevBox && prevBox.classList.contains('letter-box')) {
+                    prevBox.focus();
+                }
+                e.preventDefault();
+            } else if (e.key === 'Ar
