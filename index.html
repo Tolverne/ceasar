@@ -24,6 +24,74 @@
             align-items: center;
             justify-content: center;
             color: #333;
+            padding: 20px 0;
+        }
+
+        .install-prompt {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 90vw;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .install-prompt.hidden {
+            display: none;
+        }
+
+        .install-text {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .install-button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .install-button:hover {
+            background: #5a5fd8;
+        }
+
+        .close-button {
+            background: #e5e7eb;
+            color: #6b7280;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .close-button:hover {
+            background: #d1d5db;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
         }
 
         .header {
@@ -143,6 +211,84 @@
             z-index: 3;
         }
 
+        .notes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .message-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            min-height: 50px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 3px solid #333;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .original-row {
+            background: #ff7f7f;
+        }
+
+        .encrypted-row {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .letter-box {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #333;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            user-select: none;
+        }
+
+        .letter-box:hover {
+            background: white;
+        }
+
+        .letter-box.active {
+            background: #ffff99;
+            border: 2px solid #333;
+        }
+
+        .letter-box.space {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px dashed #666;
+        }
+
+        .add-letter-btn {
+            width: 35px;
+            height: 35px;
+            border: 2px dashed #333;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-letter-btn:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: scale(1.1);
+        }
+
         @media (max-width: 640px) {
             .cipher-container {
                 width: 320px;
@@ -172,10 +318,34 @@
             .inner-segment {
                 padding-bottom: 20px;
             }
+
+            .install-prompt {
+                top: 10px;
+                padding: 0.75rem 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .install-text {
+                font-size: 0.8rem;
+            }
+
+            .letter-box, .add-letter-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="install-prompt" id="installPrompt">
+        <div class="install-text">📱 Install Cipher Wheel as an app for easy access!</div>
+        <button class="install-button" id="installButton">Install App</button>
+        <button class="close-button" id="closePrompt">✕</button>
+    </div>
+
     <div class="header">
         <h1>🔐 Caesar Cipher Wheel</h1>
         <p>Drag the inner wheel to encode and decode messages!</p>
@@ -192,24 +362,12 @@
     </div>
 
     <div class="notes-container">
-        <div class="notes-title">📝 Message Notes</div>
-        
-        <div class="note-section">
-            <label class="note-label original-label">Original Message:</label>
-            <textarea 
-                class="note-textarea original-textarea" 
-                placeholder="Write your original message here..."
-                rows="2"
-            ></textarea>
+        <div class="message-row original-row" id="originalRow">
+            <div class="add-letter-btn" onclick="addLetterBox('originalRow')">+</div>
         </div>
         
-        <div class="note-section">
-            <label class="note-label encrypted-label">Encrypted Message:</label>
-            <textarea 
-                class="note-textarea encrypted-textarea" 
-                placeholder="Write your encrypted message here..."
-                rows="2"
-            ></textarea>
+        <div class="message-row encrypted-row" id="encryptedRow">
+            <div class="add-letter-btn" onclick="addLetterBox('encryptedRow')">+</div>
         </div>
     </div>
 
@@ -221,25 +379,32 @@
         const totalSteps = alphabet.length;
         const stepAngle = 360 / totalSteps;
         let deferredPrompt;
+        let installPromptShown = false;
 
         // PWA Install functionality
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            showInstallPrompt();
+            if (!installPromptShown) {
+                showInstallPrompt();
+            }
         });
 
         function showInstallPrompt() {
+            installPromptShown = true;
             const installPrompt = document.getElementById('installPrompt');
             const installButton = document.getElementById('installButton');
             const closeButton = document.getElementById('closePrompt');
 
-            // Show for 10 seconds, then auto-hide if not interacted with
+            // Show the prompt
+            installPrompt.classList.remove('hidden');
+
+            // Auto-hide after 15 seconds if not interacted with
             setTimeout(() => {
                 if (!installPrompt.classList.contains('hidden')) {
                     installPrompt.classList.add('hidden');
                 }
-            }, 10000);
+            }, 15000);
 
             installButton.addEventListener('click', async () => {
                 if (deferredPrompt) {
@@ -265,22 +430,34 @@
             return isSafari;
         }
 
-        // Show install prompt for iOS users with different text
+        // Always show install prompt on page load
         window.addEventListener('load', () => {
+            const installPrompt = document.getElementById('installPrompt');
+            const installText = document.querySelector('.install-text');
+            const installButton = document.getElementById('installButton');
+            const closeButton = document.getElementById('closePrompt');
+            
             if (isIOSSafari() && !window.navigator.standalone) {
-                const installPrompt = document.getElementById('installPrompt');
-                const installText = document.querySelector('.install-text');
-                const installButton = document.getElementById('installButton');
-                
-                installText.textContent = '📱 Add to Home Screen: Tap Share button ⬆️ then "Add to Home Screen"';
+                // iPad/iPhone Safari specific instructions
+                installText.innerHTML = '📱 <strong>Add to Home Screen:</strong><br>Tap Share button <strong>⬆️</strong> then "Add to Home Screen"';
                 installButton.style.display = 'none';
+                installPrompt.classList.remove('hidden');
+                
+                closeButton.addEventListener('click', () => {
+                    installPrompt.classList.add('hidden');
+                });
                 
                 setTimeout(() => {
-                    installPrompt.classList.add('hidden');
-                }, 12000);
-            } else if (!deferredPrompt) {
-                // Show generic install message for other browsers that might support PWA
-                setTimeout(showInstallPrompt, 2000);
+                    if (!installPrompt.classList.contains('hidden')) {
+                        installPrompt.classList.add('hidden');
+                    }
+                }, 15000);
+            } else {
+                // Other browsers - show generic install message and wait for PWA prompt
+                installPrompt.classList.remove('hidden');
+                if (!installPromptShown) {
+                    showInstallPrompt();
+                }
             }
         });
 
@@ -377,7 +554,7 @@
             isDragging = false;
         }
 
-        // Add event listeners
+        // Add event listeners for wheel
         const innerWheel = document.getElementById('innerWheel');
         
         innerWheel.addEventListener('mousedown', startDrag);
@@ -390,9 +567,6 @@
 
         // Prevent context menu on long press
         innerWheel.addEventListener('contextmenu', e => e.preventDefault());
-
-        // Initialize the wheels when page loads
-        document.addEventListener('DOMContentLoaded', initializeWheels);
 
         // Letter box functionality for notes
         function addLetterBox(rowId) {
@@ -469,6 +643,9 @@
                 e.preventDefault();
             }
         }
+
+        // Initialize the wheels when page loads
+        document.addEventListener('DOMContentLoaded', initializeWheels);
     </script>
 </body>
 </html>
