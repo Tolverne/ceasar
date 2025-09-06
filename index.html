@@ -4,9 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caesar Cipher Wheel</title>
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkNhZXNhciBDaXBoZXIgV2hlZWwiLAogICJzaG9ydF9uYW1lIjogIkNpcGhlciBXaGVlbCIsCiAgImRlc2NyaXB0aW9uIjogIkEgc2ltcGxlIGNpcGhlciB3aGVlbCBmb3IgbGVhcm5pbmcgQ2Flc2FyIGNpcGhlcnMiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgInRoZW1lX2NvbG9yIjogIiMyNTYzZWIiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmOWZhZmIiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXlOalFpSUdobGFXZG9kRDBpTWpZMElpQjJhV1YzUW05NFBTSXdJREFnTWpZMElESTJOQ0krUEdOcGNtTnNaU0JqZUQwaU1UTXlJaUJqZVQwaU1UTXlJaUJ5UFNJeE1EQWlJR1pwYkd3OUlpTXlOVFl6WldJaUx6NDhkR1Y0ZENCNFBTSXhNeklpSUhrOUlqRXpNaUlnWm1sc2JEMGlJMlptWm1abUlpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJtYjI1MExXWmhiV2xzZVQwaWJXOXViM053WVdObElpQm1iMjUwTFhOcGVtVTlJamt3SWlCbWIyNTBMWGRsYVdkb2REMGlObTFoYmlJK1F6d3ZkR1Y0ZEQ0OEwzTjJaejQ9IiwKICAgICAgInNpemVzIjogIjI2NHgyNjQiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
-    <meta name="theme-color" content="#2563eb">
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNjQiIGhlaWdodD0iMjY0IiB2aWV3Qm94PSIwIDAgMjY0IDI2NCI+PGNpcmNsZSBjeD0iMTMyIiBjeT0iMTMyIiByPSIxMDAiIGZpbGw9IiMyNTYzZWIiLz48dGV4dCB4PSIxMzIiIHk9IjEzMiIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSI5MCIgZm9udC13ZWlnaHQ9IjZtYW4iPkM8L3RleHQ+PC9zdmc+">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkNhZXNhciBDaXBoZXIgV2hlZWwiLAogICJzaG9ydF9uYW1lIjogIkNpcGhlciBXaGVlbCIsCiAgImRlc2NyaXB0aW9uIjogIkEgc2ltcGxlIGNpcGhlciB3aGVlbCBmb3IgbGVhcm5pbmcgQ2Flc2FyIGNpcGhlcnMiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgInRoZW1lX2NvbG9yIjogIiM2NjdlZWEiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM2NjdlZWEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXlOalFpSUdobGFXZG9kRDBpTWpZMElpQjJhV1YzUW05NFBTSXdJREFnTWpZMElESTJOQ0krUEdOcGNtTnNaU0JqZUQwaU1UTXlJaUJqZVQwaU1UTXlJaUJ5UFNJeE1EQWlJR1pwYkd3OUlpTXlOVFl6WldJaUx6NDhkR1Y0ZENCNFBTSXhNeklpSUhrOUlqRXpNaUlnWm1sc2JEMGlJMlptWm1abUlpQjBaWGgwTFdGdVkyaHZjajBpYldsa1pHeGxJaUJtYjI1MExXWmhiV2xzZVQwaWJXOXViM053WVdObElpQm1iMjUwTFhOcGVtVTlJamt3SWlCbWIyNTBMWGRsYVdkb2REMGlObTFoYmlJK1F6d3ZkR1Y0ZEQ0OEwzTjJaejQ9IiwKICAgICAgInNpemVzIjogIjI2NHgyNjQiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
+    
+    <!-- iOS Safari specific meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Cipher Wheel">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNjQiIGhlaWdodD0iMjY0IiB2aWV3Qm94PSIwIDAgMjY0IDI2NCI+PGNpcmNsZSBjeD0iMTMyIiBjeT0iMTMyIiByPSIxMDAiIGZpbGw9IiMyNTYzZWIiLz48dGV4dCB4PSIxMzIiIHk9IjEzMiIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSI5MCIgZm9udC13ZWlnaHQ9IjZtYW4iPkM8L3RleHQ+PC9zdmc+">
+    
+    <!-- Theme color -->
+    <meta name="theme-color" content="#667eea">
     
     <style>
         * {
@@ -462,13 +471,43 @@
         let installPromptShown = false;
         let lettersPerRow = 10;
 
+        // Service Worker for offline functionality
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'cipher-wheel-v1';
+                self.addEventListener('install', event => {
+                    self.skipWaiting();
+                });
+                self.addEventListener('activate', event => {
+                    event.waitUntil(clients.claim());
+                });
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request).then(response => {
+                            return response || fetch(event.request).then(fetchResponse => {
+                                const responseClone = fetchResponse.clone();
+                                caches.open(CACHE_NAME).then(cache => {
+                                    cache.put(event.request, responseClone);
+                                });
+                                return fetchResponse;
+                            });
+                        }).catch(() => {
+                            return new Response('App works offline!');
+                        })
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl);
+        }
+
         // PWA Install functionality
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (!installPromptShown) {
-                showInstallPrompt();
-            }
+            showInstallPrompt();
         });
 
         function showInstallPrompt() {
